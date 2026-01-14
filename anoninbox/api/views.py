@@ -36,6 +36,21 @@ class BoxRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             return [AllowAny()]
         return [IsAuthenticated(), IsOwner()]
 
+class StartThreadView(generics.CreateAPIView):
+    serializer_class = StartThreadSerializer
+
+    def perform_create(self, serializer):
+        if self.request.user.id is not None:
+            serializer.save(
+                user_email=self.request.user,
+                non_user_email=None
+            )
+        else:
+            serializer.save()
+
+
+
+
 
 
 
