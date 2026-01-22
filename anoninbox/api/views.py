@@ -17,7 +17,7 @@ class AuthTestView(APIView):
 class BoxListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = BoxSerializer
-
+    
     def perform_create(self, serializer):
         serializer.save(box_maker=self.request.user)
 
