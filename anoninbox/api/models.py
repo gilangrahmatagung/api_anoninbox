@@ -31,7 +31,7 @@ class Message(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
 
-    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE, related_name="messages") # related name ini biar si message ini bisa diquery dari Thread
 
     def __str__(self):
         return self.message_title

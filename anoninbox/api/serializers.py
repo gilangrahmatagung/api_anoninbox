@@ -18,11 +18,21 @@ class ThreadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MessageSerializer(serializers.ModelSerializer):
+    thread = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Message
         fields = '__all__'
 
 # -------------------------------------------------------------------
+
+class ThreadAndMessagesSerializer(serializers.ModelSerializer):
+    messages = MessageSerializer(many=True)
+
+    class Meta:
+        model = Thread # bukan Messages ke Thread, karena queryset nya Thread
+        fields = '__all__'
+
 
 class StartThreadSerializer(serializers.Serializer):
     box = serializers.IntegerField(write_only=True)

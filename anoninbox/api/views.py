@@ -34,9 +34,10 @@ class BoxRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     def get_permissions(self):
         if self.request.method == "GET":
             return [AllowAny()]
-        return [IsAuthenticated(), IsOwner()]
+        return [IsAuthenticated(), IsBoxOwner()]
 
 class StartThreadView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
     serializer_class = StartThreadSerializer
 
     def perform_create(self, serializer):
@@ -47,6 +48,24 @@ class StartThreadView(generics.CreateAPIView):
             )
         else:
             serializer.save()
+
+class ThreadAndMessagesView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, IsBoxOfThreadOwner]
+    serializer_class = ThreadAndMessagesSerializer
+
+    def get_queryset(self):
+        box_id = self.kwargs.get('box_id')
+
+        return Thread.objects.filter(box=box_id)
+
+class SendMessageView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, IsThreadMember]
+    serializer_class = MessageSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(
+            thread_id=self.kwargs.get("thread_id")
+        )
 
 
 
