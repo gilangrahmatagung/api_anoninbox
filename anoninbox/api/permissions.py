@@ -6,7 +6,7 @@ class IsBoxOwner(BasePermission):
 
     def has_permission(self, request, view):
         try:
-            box = Box.objects.get(id=view.kwargs.get("box_id"))
+            box = Box.objects.get(id=view.kwargs.get("pk"))
             box_owner = box.box_maker
 
             return box_owner == request.user
