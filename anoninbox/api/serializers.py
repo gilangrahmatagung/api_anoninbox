@@ -34,32 +34,9 @@ class ThreadAndMessagesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class StartThreadSerializer(serializers.Serializer):
-    box = serializers.IntegerField(write_only=True)
-
+class StartThreadSerializer(serializers.Serializer):  # karena nested serializer tidak bisa untuk create jadi gabisa gabung sama thread and messages
+    box = serializers.PrimaryKeyRelatedField(read_only=True)
+    non_user_email = serializers.EmailField(max_length=50, required=False)
+    
     message_title = serializers.CharField(max_length=50, required=False)
     message_body = serializers.CharField(max_length=1000)
-
-    non_user_email = serializers.EmailField(max_length=50, required=False)
-    user_email = serializers.IntegerField(read_only=True, required=False)
-
-    def create(self, validated_data):
-        with transaction.atomic():
-            box = Box.objects.get(id=validated_data["box"])
-
-            thread = Thread.objects.create(
-                box = box,
-                non_user_email = validated_data.get("non_user_email"), # kalau non-required field gini caranya
-                user_email = validated_data.get("user_email")
-            )
-
-            message = Message.objects.create(
-                message_title = validated_data.get("message_title"),
-                message_body = validated_data["message_body"],
-                thread = thread
-            )
-        
-        return message
-    
-    def update(self, instance, validated_data):
-        return instance

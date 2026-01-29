@@ -1,8 +1,8 @@
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, viewsets
+from django.db import transaction
 
 from .permissions import *
 from .models import *
@@ -37,71 +37,50 @@ class BoxRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             return [AllowAny()]
         return [IsAuthenticated(), IsBoxOwner()]
 
-class ThreadListCreateView(ListModelMixin, CreateModelMixin, viewsets.GenericViewSet):
-    def get_permissions(self):
-        if self.action == "list":
-            return [IsAuthenticated(), IsBoxOfThreadOwner()]
-        if self.action == "create":
-            return [AllowAny()]
+# Thread and Messages & Start Thread
+class ThreadListCreateView(generics.ListCreateAPIView):
 
-        return super().get_permissions()
-    
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [AllowAny()]
+        return [IsAuthenticated(), IsBoxOfThreadOwner()]
+
     def get_serializer_class(self):
-        if self.action =="list":
-            return ThreadAndMessagesSerializer
-        if self.action =="create":
+        if self.request.method == "POST":
             return StartThreadSerializer
-        
-        return ThreadSerializer
-    
+        return ThreadAndMessagesSerializer
+
+    # Thread and messages
     def get_queryset(self):
-        if self.action == "list":
+        if self.request.method == "GET":
             box_id = self.kwargs.get('box_id')
             return Thread.objects.filter(box=box_id)
-
         return super().get_queryset()
     
+    # Start Thread
+    @transaction.atomic
     def perform_create(self, serializer):
         if self.request.user.id is not None:
-            print("SUDAH PUNYA EMAIL")
-            serializer.save(
-                user_email=self.request.user,
-                non_user_email=None
-            )
-        else:
-            serializer.save()
-
-# class StartThreadView(generics.CreateAPIView):
-#     permission_classes = [AllowAny]
-#     serializer_class = StartThreadSerializer
-
-    # def perform_create(self, serializer):
-    #     if self.request.user.id is not None:
-    #         print("SUDAH PUNYA EMAIL")
-    #         serializer.save(
-    #             user_email=self.request.user,
-    #             non_user_email=None
-    #         )
-    #     else:
-    #         serializer.save()
-
-# class ThreadAndMessagesView(generics.ListAPIView):
-#     permission_classes = [IsAuthenticated, IsBoxOfThreadOwner]
-#     serializer_class = ThreadAndMessagesSerializer
-
-#     def get_queryset(self):
-#         box_id = self.kwargs.get('box_id')
-
-#         return Thread.objects.filter(box=box_id)
+            user_email = self.request.user
+        
+        thread = Thread.objects.create(
+                    box_id=self.kwargs.get("box_id"),
+                    user_email=user_email if user_email else None,
+                    non_user_email=serializer.validated_data.get("non_user_email")
+                )
+        
+        Message.objects.create(
+            thread = thread,
+            message_title=serializer.validated_data.get("message_title"),
+            message_body=serializer.validated_data["message_body"]
+        )
 
 class SendMessageView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsThreadMember]
     serializer_class = MessageSerializer
 
     def perform_create(self, serializer):
-        serializer.save(
-            thread_id=self.kwargs.get("thread_id")
-        )
+        serializer.save(thread_id=self.kwargs.get("thread_id"))
 
 
 
