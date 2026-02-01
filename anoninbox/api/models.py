@@ -33,6 +33,8 @@ class Message(models.Model):
 
     thread = models.ForeignKey(Thread, on_delete=models.CASCADE, related_name="messages") # related name ini biar si message ini bisa diquery dari Thread
 
+    is_author_box_maker = models.BooleanField(default=False)
+
     def __str__(self):
         return self.message_title
     

@@ -60,12 +60,13 @@ class ThreadListCreateView(generics.ListCreateAPIView):
     # Start Thread
     @transaction.atomic
     def perform_create(self, serializer):
+        user_email = None
         if self.request.user.id is not None:
             user_email = self.request.user
         
         thread = Thread.objects.create(
                     box_id=self.kwargs.get("box_id"),
-                    user_email=user_email if user_email else None,
+                    user_email=user_email,
                     non_user_email=serializer.validated_data.get("non_user_email")
                 )
         
