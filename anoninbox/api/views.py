@@ -60,9 +60,15 @@ class ThreadListCreateView(generics.ListCreateAPIView):
     # Start Thread
     @transaction.atomic
     def perform_create(self, serializer):
+        box_owner = Box.objects.get(id=self.kwargs.get("box_id")).box_maker
+
+        is_author_box_maker = False
         user_email = None
         if self.request.user.id is not None:
-            user_email = self.request.user
+            if self.request.user == box_owner:
+                is_author_box_maker = True
+            else:
+                user_email = self.request.user
         
         thread = Thread.objects.create(
                     box_id=self.kwargs.get("box_id"),
@@ -73,7 +79,8 @@ class ThreadListCreateView(generics.ListCreateAPIView):
         Message.objects.create(
             thread = thread,
             message_title=serializer.validated_data.get("message_title"),
-            message_body=serializer.validated_data["message_body"]
+            message_body=serializer.validated_data["message_body"],
+            is_author_box_maker=is_author_box_maker
         )
 
 class SendMessageView(generics.CreateAPIView):
@@ -81,7 +88,16 @@ class SendMessageView(generics.CreateAPIView):
     serializer_class = MessageSerializer
 
     def perform_create(self, serializer):
-        serializer.save(thread_id=self.kwargs.get("thread_id"))
+        box_owner = Box.objects.get(id=self.kwargs.get("box_id")).box_maker
+
+        is_author_box_maker = False
+        if box_owner==self.request.user:
+            is_author_box_maker = True
+
+        serializer.save(
+            thread_id=self.kwargs.get("thread_id"),
+            is_author_box_maker=is_author_box_maker
+        )
 
 
 

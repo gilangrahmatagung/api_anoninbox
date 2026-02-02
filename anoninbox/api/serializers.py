@@ -19,6 +19,7 @@ class ThreadSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     thread = serializers.PrimaryKeyRelatedField(read_only=True)
+    is_author_box_maker = serializers.ReadOnlyField()
 
     class Meta:
         model = Message
@@ -40,3 +41,4 @@ class StartThreadSerializer(serializers.Serializer):  # karena nested serializer
     
     message_title = serializers.CharField(max_length=50, required=False)
     message_body = serializers.CharField(max_length=1000)
+    is_author_box_maker = serializers.BooleanField(read_only=True)
