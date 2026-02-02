@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'rest_framework.authtoken',
 
     "drf_spectacular",
 
@@ -168,5 +167,3 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
-
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]

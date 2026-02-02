@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularSwaggerSplitView, SpectacularAPIView, SpectacularRedocView
+# from rest_framework.urls import views
 
 urlpatterns = [
     path('ipa/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -24,6 +25,8 @@ urlpatterns = [
     path('ipa/redoc', SpectacularRedocView.as_view(), name='redoc-ui'),
 
     path('admin/', admin.site.urls),
+
+    # path('ipa/users/', include('rest_framework.urls')), # aslinya punya built-in view untuk login/logout, tapi return pages
 
     path('ipa/api/', include('api.urls')),
     path('ipa/users/', include('users.urls'))
