@@ -1,0 +1,2 @@
+- Notifikasi email
+- Konfirmasi akun

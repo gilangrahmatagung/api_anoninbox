@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +47,9 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
 
-    'corsheaders'
+    'corsheaders',
+
+    'anymail'
 ]
 
 MIDDLEWARE = [
@@ -167,3 +171,28 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# ------------------------------------------------------------------
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+# Set the project base directory
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, 'anoninbox', '.env'))
+
+# False if not in os.environ because of casting above
+DEBUG = env('DEBUG')
+
+
+# ------------------------------------------------------------------------
+
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+ANYMAIL = {
+    "RESEND_API_KEY": env("RESEND_API_KEY"),
+}
+DEFAULT_FROM_EMAIL = "AnonInbox <notification@mail.anoninbox.web.id>"
