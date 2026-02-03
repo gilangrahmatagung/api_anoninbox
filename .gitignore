@@ -1,0 +1,22 @@
+# Environment variables
+.env
+.env.*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff
+*.log
+local_settings.py
+media/
+
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# IDE / OS
+.vscode/
