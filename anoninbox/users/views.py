@@ -101,3 +101,67 @@ class LogoutView(APIView):
 
         return Response({"message": "Logged out"})
 
+class AskPasswordResetView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = AskUserVerificationSerializer
+
+    def post(self, request):
+        serializer = AskUserVerificationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            if User.objects.get(email=serializer.validated_data['email']): # cek apakah sudah registrasi
+                # buat token
+                token_to_db = secrets.token_urlsafe(16)
+                # kirim ke user
+                send_mail(
+                    subject="AnonInbox | Atur Ulang Sandi",
+                    message=f"""
+                                Silakan lakukan atur ulang sandi dengan {token_to_db}
+                            """,
+                    recipient_list=[serializer.validated_data['email']],
+                    from_email=None,
+                    fail_silently=False
+                )
+                # simpan ke db
+                UserVerification.objects.update_or_create(
+                    email=serializer.validated_data['email'],
+                    defaults={'verification_token':token_to_db}
+                )
+
+                return Response({"message":"Token atur ulang sandi telah dikirim"})
+            else:
+                return Response({"error":"Permintaan atur ulang sandi gagal"}, status=400)
+        except Exception as e:
+            print(f"ERROR: {e}")
+            return Response({"error":"User dengan email tidak ditemukan"}, status=400)
+
+class CheckPasswordResetView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = CheckPasswordResetSerializer
+
+    def post(self, request):
+        serializer = CheckPasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            token_in_db = UserVerification.objects.get(email=serializer.validated_data['email']).verification_token
+
+            if token_in_db==serializer.validated_data['verification_token']:
+                User.objects.get(email=serializer.validated_data['email']).delete()
+
+                User.objects.create_user(
+                    email=serializer.validated_data['email'],
+                    password=serializer.validated_data['password'],
+                    is_active=True
+                )
+
+                UserVerification.objects.get(email=serializer.validated_data['email']).delete()
+
+                return Response({"message":"Berhasil mengatur ulang sandi"})
+            else:
+                return Response({"error":"Gagal mengatur ulang sandi"}, status=400)
+        
+        except:
+            return Response({"error":"User dengan email tidak ditemukan"}, status=400)
+        

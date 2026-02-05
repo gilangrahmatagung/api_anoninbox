@@ -35,4 +35,8 @@ class CheckUserVerificationSerializer(serializers.ModelSerializer):
         model = UserVerification
         fields = '__all__'
 
+class CheckPasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    verification_token = serializers.CharField()
+    password = serializers.CharField()
     

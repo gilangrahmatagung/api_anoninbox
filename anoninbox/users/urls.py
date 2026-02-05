@@ -7,5 +7,7 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name='logout'),
 
     path('ask-verification/', views.AskUserVerificationView.as_view()),
-    path('check-verification/', views.CheckUserVerificationView.as_view())
+    path('check-verification/', views.CheckUserVerificationView.as_view()),
+    path('ask-password-reset/', views.AskPasswordResetView.as_view()),
+    path('check-password-reset/', views.CheckPasswordResetView.as_view())
 ]
