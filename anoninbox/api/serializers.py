@@ -1,7 +1,12 @@
 from rest_framework import serializers
-from django.db import transaction
+from cryptography.fernet import Fernet
+from django.conf import settings
 
 from .models import *
+
+
+
+fernet = Fernet(settings.MESSAGE_ENCRYPTION_KEY)
 
 class BoxSerializer(serializers.ModelSerializer):
     box_maker = serializers.ReadOnlyField(source="box_maker_id")
@@ -25,6 +30,27 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = '__all__'
 
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+
+        if data["message_title"] is not None:
+            print("MASUK SINI1")
+            data["message_title"] = fernet.encrypt(data["message_title"].encode()).decode()
+        data["message_body"] = fernet.encrypt(data["message_body"].encode()).decode()
+
+        return data
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        if data["message_title"] is not None:
+            print("MASUK SINI2")
+
+            data["message_title"] = fernet.decrypt(data["message_title"].encode()).decode()
+        data["message_body"] = fernet.decrypt(data["message_body"].encode()).decode()
+
+        return data
+
 # -------------------------------------------------------------------
 
 class ThreadAndMessagesSerializer(serializers.ModelSerializer):
@@ -42,3 +68,27 @@ class StartThreadSerializer(serializers.Serializer):  # karena nested serializer
     message_title = serializers.CharField(max_length=50, required=False)
     message_body = serializers.CharField(max_length=1000)
     is_author_box_maker = serializers.BooleanField(read_only=True)
+
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+
+        if data["message_title"] is not None:
+            print("MASUK SINI3")
+
+            data["message_title"] = fernet.encrypt(data["message_title"].encode()).decode()
+        
+        data["message_body"] = fernet.encrypt(data["message_body"].encode()).decode()
+
+        return data
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        if data["message_title"] is not None:
+            print("MASUK SINI4")
+
+            data["message_title"] = fernet.decrypt(data["message_title"].encode()).decode()
+        
+        data["message_body"] = fernet.decrypt(data["message_body"].encode()).decode()
+
+        return data

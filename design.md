@@ -1,2 +1,6 @@
-- Notifikasi email
-- Konfirmasi akun
+- sendmessage dan email notifnya
+- Memastikan pesan aman tersimpan
+- Memastikan pesan tidak masuk spam email
+
+
+di backend buat bos harus title and desc

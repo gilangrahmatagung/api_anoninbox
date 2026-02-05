@@ -198,3 +198,5 @@ ANYMAIL = {
     "RESEND_API_KEY": env("RESEND_API_KEY"),
 }
 DEFAULT_FROM_EMAIL = "AnonInbox <notification@mail.anoninbox.web.id>"
+
+MESSAGE_ENCRYPTION_KEY = env("MESSAGE_ENCRYPTION_KEY")

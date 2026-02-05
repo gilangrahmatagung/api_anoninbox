@@ -90,7 +90,7 @@ class ThreadListCreateView(generics.ListCreateAPIView):
         def email_message():
             send_mail( # fungsi ini sebenarnya mereturn jumlah email terkirim
                 subject="AnonInbox | New Message",
-                message=serializer.validated_data['message_body'],
+                message=self.request.data['message_body'],
                 from_email=None,
                 recipient_list=[User.objects.get(id=box_owner.id).email],
                 fail_silently=False
