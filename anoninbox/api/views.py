@@ -1,3 +1,5 @@
+import threading
+from django.core.mail import send_mail
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +10,7 @@ from .permissions import *
 from .models import *
 from .serializers import *
 
+User = get_user_model()
 
 class AuthTestView(APIView):
     permission_classes = [IsAuthenticated]
@@ -82,6 +85,18 @@ class ThreadListCreateView(generics.ListCreateAPIView):
             message_body=serializer.validated_data["message_body"],
             is_author_box_maker=is_author_box_maker
         )
+
+        # KIRIM EMAIL
+        def email_message():
+            send_mail( # fungsi ini sebenarnya mereturn jumlah email terkirim
+                subject="AnonInbox | New Message",
+                message=serializer.validated_data['message_body'],
+                from_email=None,
+                recipient_list=[User.objects.get(id=box_owner.id).email],
+                fail_silently=False
+            )
+
+        transaction.on_commit(lambda: threading.Thread(target=email_message).start())
 
 class SendMessageView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsThreadMember]
