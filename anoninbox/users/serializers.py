@@ -1,5 +1,3 @@
-import secrets
-from django.core.mail import send_mail
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import UserVerification
@@ -12,20 +10,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
-    
-    def create(self, validated_data):
-        return User.objects.create_user(
-            email=validated_data['email'],
-            password=validated_data['password'],
-            is_active=False
-        )
 
-class AskUserVerificationSerializer(serializers.ModelSerializer):
-    verification_token = serializers.ReadOnlyField()
-
-    class Meta:
-        model = UserVerification
-        fields = '__all__'
+class AskUserVerificationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
 
 class CheckUserVerificationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)

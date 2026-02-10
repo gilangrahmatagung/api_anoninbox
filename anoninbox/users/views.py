@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage, send_mail
+from django.template.loader import render_to_string
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
@@ -14,6 +15,49 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserSerializer
 
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # register
+        User = get_user_model()
+        new_user = User.objects.create_user(
+            email=serializer.validated_data['email'],
+            password=serializer.validated_data['password'],
+            is_active=False
+        )
+        
+        # verification
+        if new_user:
+            token_to_db = secrets.token_urlsafe(16)
+            # kirim ke user
+            content = render_to_string('emails/user-verification.html', {
+                    'token': token_to_db,
+                    'email': serializer.validated_data['email']
+            })
+
+            message = EmailMessage(
+                subject="AnonInbox | Verifikasi Akun",
+                body=content,
+                from_email=None,
+                to=[serializer.validated_data['email']]
+            )
+
+            message.content_subtype = "html"
+            message.send()
+
+            # simpan ke db
+            UserVerification.objects.update_or_create(
+                email=serializer.validated_data['email'],
+                defaults={'verification_token':token_to_db}
+            )
+            
+            return Response({"message":"Token verifikasi telah dikirim"})
+        
+        else:
+            return Response({"error":"User gagal dibuat, telah terjadi kesalahan."}, status=400)
+
+
 class AskUserVerificationView(APIView):
     permission_classes = [AllowAny]
     serializer_class = AskUserVerificationSerializer
@@ -27,26 +71,30 @@ class AskUserVerificationView(APIView):
                 # buat token
                 token_to_db = secrets.token_urlsafe(16)
                 # kirim ke user
-                send_mail(
+                content = render_to_string('emails/user-verification.html', {
+                        'token': token_to_db,
+                        'email': serializer.validated_data['email']
+                })
+
+                message = EmailMessage(
                     subject="AnonInbox | Verifikasi Akun",
-                    message=f"""
-                                Silakan lakukan verifikasi dengan {token_to_db}
-                            """,
-                    recipient_list=[serializer.validated_data['email']],
+                    body=content,
                     from_email=None,
-                    fail_silently=False
+                    to=[serializer.validated_data['email']]
                 )
+
+                message.content_subtype = "html"
+                message.send()
                 # simpan ke db
                 UserVerification.objects.update_or_create(
                     email=serializer.validated_data['email'],
                     defaults={'verification_token':token_to_db}
                 )
-
+                
                 return Response({"message":"Token verifikasi telah dikirim"})
             else:
                 return Response({"error":"Permintaan verifikasi gagal"}, status=400)
-        except Exception as e:
-            print(f"ERROR: {e}")
+        except:
             return Response({"error":"User dengan email tidak ditemukan"}, status=400)
 
 class CheckUserVerificationView(APIView):
@@ -114,15 +162,21 @@ class AskPasswordResetView(APIView):
                 # buat token
                 token_to_db = secrets.token_urlsafe(16)
                 # kirim ke user
-                send_mail(
+                content = render_to_string('emails/password-reset.html', {
+                        'token': token_to_db,
+                        'email': serializer.validated_data['email']
+                })
+
+                message = EmailMessage(
                     subject="AnonInbox | Atur Ulang Sandi",
-                    message=f"""
-                                Silakan lakukan atur ulang sandi dengan {token_to_db}
-                            """,
-                    recipient_list=[serializer.validated_data['email']],
+                    body=content,
                     from_email=None,
-                    fail_silently=False
+                    to=[serializer.validated_data['email']]
                 )
+
+                message.content_subtype = "html"
+                terkirim = message.send()
+                print(f"TERKIRIM {terkirim}")
                 # simpan ke db
                 UserVerification.objects.update_or_create(
                     email=serializer.validated_data['email'],
@@ -148,13 +202,11 @@ class CheckPasswordResetView(APIView):
             token_in_db = UserVerification.objects.get(email=serializer.validated_data['email']).verification_token
 
             if token_in_db==serializer.validated_data['verification_token']:
-                User.objects.get(email=serializer.validated_data['email']).delete()
+                User = get_user_model()
+                user = User.objects.get(email=serializer.validated_data['email'])
 
-                User.objects.create_user(
-                    email=serializer.validated_data['email'],
-                    password=serializer.validated_data['password'],
-                    is_active=True
-                )
+                user.set_password(serializer.validated_data['password'])
+                user.save()
 
                 UserVerification.objects.get(email=serializer.validated_data['email']).delete()
 
