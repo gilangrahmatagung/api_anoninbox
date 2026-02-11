@@ -98,7 +98,19 @@ class ThreadListCreateView(generics.ListCreateAPIView):
 
         transaction.on_commit(lambda: threading.Thread(target=email_message).start())
 
-class SendMessageView(generics.CreateAPIView):
+# Thread and Messages with spesific sender. Hanya diakses sender.
+class ThreadListWithSenderView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ThreadAndMessagesSerializer
+    
+    def get_queryset(self):
+        box_id = self.kwargs.get("box_id")
+        user_requested = self.request.user
+
+        return Thread.objects.filter(box=box_id, user_email=user_requested)
+
+# Send Message
+class MessageCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsThreadMember]
     serializer_class = MessageSerializer
 

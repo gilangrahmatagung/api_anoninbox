@@ -8,6 +8,7 @@ urlpatterns = [
     path('boxes/<int:pk>/', views.BoxRetrieveUpdateDestroyView.as_view()),
     
     path('boxes/<int:box_id>/threads/', views.ThreadListCreateView.as_view()),
-    path('boxes/<int:box_id>/threads/<int:thread_id>/', views.SendMessageView.as_view()),
+    path('boxes/<int:box_id>/threads-with-sender/', views.ThreadListWithSenderView.as_view()),
+    path('boxes/<int:box_id>/threads/<int:thread_id>/', views.MessageCreateView.as_view()),
 
 ]

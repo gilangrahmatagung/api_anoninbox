@@ -186,8 +186,7 @@ class AskPasswordResetView(APIView):
                 return Response({"message":"Token atur ulang sandi telah dikirim"})
             else:
                 return Response({"error":"Permintaan atur ulang sandi gagal"}, status=400)
-        except Exception as e:
-            print(f"ERROR: {e}")
+        except:
             return Response({"error":"User dengan email tidak ditemukan"}, status=400)
 
 class CheckPasswordResetView(APIView):
