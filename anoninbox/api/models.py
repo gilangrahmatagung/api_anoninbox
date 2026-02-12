@@ -6,7 +6,7 @@ User = get_user_model()
 
 class Box(models.Model):
     box_title = models.CharField(max_length=50)
-    box_description = models.CharField(max_length=200, blank=True, null=True)
+    box_description = models.CharField(max_length=1000, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)

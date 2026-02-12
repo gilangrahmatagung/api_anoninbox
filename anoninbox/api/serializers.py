@@ -33,8 +33,7 @@ class MessageSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         data = super().to_internal_value(data)
 
-        if data["message_title"] is not None:
-            print("MASUK SINI1")
+        if data.get("message_title") is not None:
             data["message_title"] = fernet.encrypt(data["message_title"].encode()).decode()
         data["message_body"] = fernet.encrypt(data["message_body"].encode()).decode()
 
@@ -42,10 +41,8 @@ class MessageSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         data = super().to_representation(instance)
-
-        if data["message_title"] is not None:
-            print("MASUK SINI2")
-
+        
+        if data.get("message_title") is not None:
             data["message_title"] = fernet.decrypt(data["message_title"].encode()).decode()
         data["message_body"] = fernet.decrypt(data["message_body"].encode()).decode()
 
@@ -72,9 +69,7 @@ class StartThreadSerializer(serializers.Serializer):  # karena nested serializer
     def to_internal_value(self, data):
         data = super().to_internal_value(data)
 
-        if data["message_title"] is not None:
-            print("MASUK SINI3")
-
+        if data.get("message_title") is not None:
             data["message_title"] = fernet.encrypt(data["message_title"].encode()).decode()
         
         data["message_body"] = fernet.encrypt(data["message_body"].encode()).decode()
@@ -83,10 +78,9 @@ class StartThreadSerializer(serializers.Serializer):  # karena nested serializer
     
     def to_representation(self, instance):
         data = super().to_representation(instance)
-
-        if data["message_title"] is not None:
-            print("MASUK SINI4")
-
+        print(f"DATANYA APA SIH? {data}")
+        
+        if data.get("message_title") is not None:
             data["message_title"] = fernet.decrypt(data["message_title"].encode()).decode()
         
         data["message_body"] = fernet.decrypt(data["message_body"].encode()).decode()
