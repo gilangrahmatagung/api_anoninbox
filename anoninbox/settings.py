@@ -35,7 +35,7 @@ SECRET_KEY = 'django-insecure-yvudc3n8^or58fw3ge31m0g997#gl+#72%nom3d49$ha$7x)ge
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "apianoninbox-production.up.railway.app"]
 
 
 # Application definition
@@ -183,11 +183,17 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "https://apianoninbox-production.up.railway.app",
+    "https://anoninbox-v2.vercel.app",
+    "http://localhost:3000"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"] # ternyata csrf ada origin juga?
+CSRF_TRUSTED_ORIGINS = [
+    "https://apianoninbox-production.up.railway.app",
+    "https://anoninbox-v2.vercel.app",
+    "http://localhost:3000"
+] # ternyata csrf ada origin juga?
 
 # ------------------------------------------------------------------
 
