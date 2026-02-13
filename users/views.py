@@ -7,8 +7,6 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import secrets
 
-from anoninbox.settings import ORIGIN_FRONTEND
-
 from .models import *
 from .serializers import *
 
@@ -74,7 +72,6 @@ class AskUserVerificationView(APIView):
                 token_to_db = secrets.token_urlsafe(16)
                 # kirim ke user
                 content = render_to_string('emails/user-verification.html', {
-                        'origin_frontend': ORIGIN_FRONTEND,
                         'token': token_to_db,
                         'email': serializer.validated_data['email']
                 })
@@ -166,7 +163,6 @@ class AskPasswordResetView(APIView):
                 token_to_db = secrets.token_urlsafe(16)
                 # kirim ke user
                 content = render_to_string('emails/password-reset.html', {
-                        'origin_frontend': ORIGIN_FRONTEND,
                         'token': token_to_db,
                         'email': serializer.validated_data['email']
                 })
