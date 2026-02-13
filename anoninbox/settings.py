@@ -186,6 +186,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://apianoninbox-production.up.railway.app",
     "https://anoninbox-v2.vercel.app",
     "https://anoninbox.web.id",
+    "https://www.anoninbox.web.id",
     "http://localhost:3000"
 ]
 CORS_ALLOW_CREDENTIALS = True
@@ -194,6 +195,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://apianoninbox-production.up.railway.app",
     "https://anoninbox-v2.vercel.app",
     "https://anoninbox.web.id",
+    "https://www.anoninbox.web.id"
     "http://localhost:3000"
 ] # ternyata csrf ada origin juga?
 
