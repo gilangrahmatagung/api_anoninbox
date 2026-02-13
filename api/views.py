@@ -90,12 +90,12 @@ class ThreadListCreateView(generics.ListCreateAPIView):
 
         # kirim email
         html_content = render_to_string('emails/new-message.html', {
-                    'message_title': serializer.validated_data.get("message_title"),
-                    'message_body': serializer.validated_data["message_body"],
+                    'message_title': self.request.data.get("message_title"),
+                    'message_body': self.request.data["message_body"],
                     'box': box.box_title
                 })
 
-        text_content = f"Pesan baru di {box.box_title}\n\n{serializer.validated_data.get("message_title")}\n\n{serializer.validated_data["message_body"]}"
+        text_content = f"Pesan baru di {box.box_title}\n\n{self.request.data.get("message_title")}\n\n{self.request.data["message_body"]}"
                 
         message = EmailMultiAlternatives(
             subject=f"AnonInbox | New Message Inbox: {box.box_title}",
