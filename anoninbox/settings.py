@@ -35,7 +35,7 @@ SECRET_KEY = 'django-insecure-yvudc3n8^or58fw3ge31m0g997#gl+#72%nom3d49$ha$7x)ge
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "apianoninbox-production.up.railway.app"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "api.anoninbox.web.id"]
 
 
 # Application definition
@@ -183,7 +183,6 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "https://apianoninbox-production.up.railway.app",
     "https://anoninbox-v2.vercel.app",
     "https://anoninbox.web.id",
     "https://www.anoninbox.web.id",
@@ -192,20 +191,14 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://apianoninbox-production.up.railway.app",
     "https://anoninbox-v2.vercel.app",
     "https://anoninbox.web.id",
     "https://www.anoninbox.web.id"
     "http://localhost:3000"
 ] # ternyata csrf ada origin juga?
 
-ORIGIN_FRONTEND = "https://www.anoninbox.web.id"
-
-SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = True
-
-CSRF_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_DOMAIN = ".anoninbox.web.id"
+CSRF_COOKIE_DOMAIN = ".anoninbox.web.id"
 # ------------------------------------------------------------------
 
 # Set the project base directory
