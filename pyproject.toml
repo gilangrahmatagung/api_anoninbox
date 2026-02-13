@@ -17,7 +17,9 @@ dependencies = [
     "django-anymail[resend] (>=14.0,<15.0)",
     "django-environ (>=0.12.0,<0.13.0)",
     "cryptography (>=46.0.4,<47.0.0)",
-    "psycopg2-binary (>=2.9.11,<3.0.0)"
+    "psycopg2-binary (>=2.9.11,<3.0.0)",
+    "gunicorn (>=25.0.3,<26.0.0)",
+    "whitenoise (>=6.11.0,<7.0.0)"
 ]
 
 [dependency-groups]
