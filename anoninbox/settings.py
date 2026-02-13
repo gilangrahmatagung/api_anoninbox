@@ -199,6 +199,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000"
 ] # ternyata csrf ada origin juga?
 
+ORIGIN_FRONTEND = "https://www.anoninbox.web.id"
 # ------------------------------------------------------------------
 
 # Set the project base directory
