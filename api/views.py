@@ -1,5 +1,6 @@
 import threading
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage, send_mail
+from django.template.loader import render_to_string
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -63,7 +64,8 @@ class ThreadListCreateView(generics.ListCreateAPIView):
     # Start Thread
     @transaction.atomic
     def perform_create(self, serializer):
-        box_owner = Box.objects.get(id=self.kwargs.get("box_id")).box_maker
+        box = Box.objects.get(id=self.kwargs.get("box_id"))
+        box_owner = box.box_maker
 
         is_author_box_maker = False
         user_email = None
@@ -87,16 +89,21 @@ class ThreadListCreateView(generics.ListCreateAPIView):
         )
 
         # KIRIM EMAIL
-        def email_message():
-            send_mail( # fungsi ini sebenarnya mereturn jumlah email terkirim
-                subject="AnonInbox | New Message",
-                message=self.request.data['message_body'],
-                from_email=None,
-                recipient_list=[User.objects.get(id=box_owner.id).email],
-                fail_silently=False
-            )
+        content = render_to_string('emails/new-message.html', {
+                    'message_title': serializer.validated_data.get("message_title"),
+                    'message_body': serializer.validated_data["message_body"]
+                })
+                
+        message = EmailMessage(
+            subject=f"AnonInbox | New Message Inbox: {box.box_title}",
+            from_email=None,
+            body=content,
+            to=[box.box_maker.email]
+        )
 
-        transaction.on_commit(lambda: threading.Thread(target=email_message).start())
+        message.content_subtype = "html"
+
+        transaction.on_commit(threading.Thread(target=message.send).start())
 
 # Thread and Messages with spesific sender. Hanya diakses sender.
 class ThreadListWithSenderView(generics.ListAPIView):
@@ -125,14 +132,3 @@ class MessageCreateView(generics.CreateAPIView):
             thread_id=self.kwargs.get("thread_id"),
             is_author_box_maker=is_author_box_maker
         )
-
-
-
-
-
-
-
-
-
-
-
