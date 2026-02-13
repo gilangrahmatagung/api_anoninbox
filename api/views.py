@@ -1,5 +1,5 @@
 import threading
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
 from django.template.loader import render_to_string
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -89,22 +89,25 @@ class ThreadListCreateView(generics.ListCreateAPIView):
         )
 
         # kirim email
-        content = render_to_string('emails/new-message.html', {
+        html_content = render_to_string('emails/new-message.html', {
                     'message_title': serializer.validated_data.get("message_title"),
                     'message_body': serializer.validated_data["message_body"],
                     'box': box.box_title
                 })
+
+        text_content = f"Pesan baru di {box.box_title}\n\n{serializer.validated_data.get("message_title")}\n\n{serializer.validated_data["message_body"]}"
                 
-        message = EmailMessage(
+        message = EmailMultiAlternatives(
             subject=f"AnonInbox | New Message Inbox: {box.box_title}",
             from_email=None,
-            body=content,
+            body=text_content,
             to=[box.box_maker.email]
         )
-
-        message.content_subtype = "html"
-
-        transaction.on_commit(threading.Thread(target=message.send).start())
+        message.attach_alternative(html_content, "text/html")
+        
+        def send_email():
+            message.send()
+        transaction.on_commit(lambda: threading.Thread(target=send_email).start())
 
 # Thread and Messages with spesific sender. Hanya diakses sender.
 class ThreadListWithSenderView(generics.ListAPIView):
