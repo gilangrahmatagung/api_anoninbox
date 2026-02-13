@@ -200,6 +200,12 @@ CSRF_TRUSTED_ORIGINS = [
 ] # ternyata csrf ada origin juga?
 
 ORIGIN_FRONTEND = "https://www.anoninbox.web.id"
+
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SECURE = True
 # ------------------------------------------------------------------
 
 # Set the project base directory
