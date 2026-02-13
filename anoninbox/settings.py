@@ -217,5 +217,3 @@ ANYMAIL = {
 DEFAULT_FROM_EMAIL = "AnonInbox <notification@mail.anoninbox.web.id>"
 
 MESSAGE_ENCRYPTION_KEY = env("MESSAGE_ENCRYPTION_KEY")
-
-print("CSRF TRUSTED:", CSRF_TRUSTED_ORIGINS)

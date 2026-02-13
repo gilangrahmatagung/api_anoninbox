@@ -88,10 +88,11 @@ class ThreadListCreateView(generics.ListCreateAPIView):
             is_author_box_maker=is_author_box_maker
         )
 
-        # KIRIM EMAIL
+        # kirim email
         content = render_to_string('emails/new-message.html', {
                     'message_title': serializer.validated_data.get("message_title"),
-                    'message_body': serializer.validated_data["message_body"]
+                    'message_body': serializer.validated_data["message_body"],
+                    'box': box.box_title
                 })
                 
         message = EmailMessage(
