@@ -193,7 +193,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "https://anoninbox-v2.vercel.app",
     "https://anoninbox.web.id",
-    "https://www.anoninbox.web.id"
+    "https://www.anoninbox.web.id",
     "http://localhost:3000"
 ] # ternyata csrf ada origin juga?
 
